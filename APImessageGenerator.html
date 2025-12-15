@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+    <title>MIS2402 Template</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Bootstrap 4 References -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
+    <!-- Link to FontAwesome -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <!-- Your custom CSS -->
+    <link rel="stylesheet" href="css/app.css"> 
+    <!-- Link to image for the favicon -->
+    <link rel="icon" href="images/TU100x100.png">
+</head>
+
+<body>
+
+<!-- Top Navigation Bar -->
+
+<nav class="navbar navbar-expand-md bg-dark navbar-dark fixed-top">
+    <!-- Logo -->
+      <a class ="navbar-brand" href="index.html">
+          <img alt="MIS2402 - TU Logo" src="images/TU100x100.png" style="width:40px;">
+          &nbsp;&nbsp;MIS2402
+      </a>
+
+    <!-- Toggler Icon for responsiveness -->
+    <button id="toggle-icon" class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
+    <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="collapsibleNavbar">
+    <!--Menu sets on the left -->
+        <ul class="navbar-nav mr-auto">
+        </ul>
+    <!--Menu sets on the right -->
+        <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+                <a id="link_logout" class="nav-link" href="#"><i class="fa fa-sign-out"></i>Logout</a>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+<br><br><br><br>
+
+<!--Start container for BS4 (Bootstrap 4) formatting-->
+<div class="container-fluid">
+
+    <div class="row">
+    <div class="col-md-2"></div>
+
+		<div class="col-md-8 content-wrapper " id="div-login" style="display: none;">
+                <form id='frm_login'>
+				<label for="username">User name:</label>
+				<input type="text" name="username" id="username" class="form-control" >
+				<label for="password">Password:</label>
+                <input type="password" name="password" id="password" class="form-control" >
+                <br>
+				<div class="text-center">
+				<input type="button" value="Login" name="btn_login" id="btn_login" class="btn btn-primary">
+                </div>
+                <br>
+                <div id='login_message'>
+                </div>
+			</form>
+		</div>
+
+        <div class="col-md-8 content-wrapper " id="div-sample" style="display: none;">
+            <h1>Sample Div</h1>
+        </div>
+
+        <div class="col-md-8 content-wrapper " id="div-quote" style="display: none;">
+            <h1>Get a quote</h1>
+            <div id="quote"></div>
+            <br>
+            <input type="button" id="btn_get_quote" value="Get an inspirational quote" class="btn btn-primary">
+            <br><br>
+            <input type="button" id="btn_show_form" value="Send it to a friend" class="btn btn-secondary">
+            <br><br>     
+        </div>
+
+        <div class="col-md-8 content-wrapper " id="div-sms" style="display: none;">
+            <h1>Send an SMS message</h1>
+            <form id="frm_send_text">
+                <input type="hidden" name="misdemousername" value="tur23547r">
+                <input type="hidden" name="misdemopassword" value="controL266">
+                <label for="phone">Phone:</label> 
+                <input type="text" id="phone" name="phone" class="form-control"><br>
+                <!-- <label for="message">Message:</label>//-->
+                <input type="hidden" id="message" name="message" class="form-control"><br><br>
+                <input type="button" id="btn_send_text" value="Send the text" class="btn btn-primary">
+                <br><br>
+                <input type="button" id="btn_show_quote" value="Go back to quotes" class="btn btn-secondary">
+                <br><br>
+                <div id='sms_message'>
+                </div>
+            </form>
+        </div>
+
+    <div class="col-md-2"></div>
+    </div>
+
+    <br>
+</div> <!-- container //-->
+
+<br>
+    <div class="container-fluid bg-dark text-white">
+        <div class="row">
+            <div class="col-md-12 text-center">
+            &copy; 2023 MIS2402
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12 text-center">
+				&nbsp; <!-- place holder for additional footer content -->
+            </div>
+        </div>
+    </div>
+</body>
+<script>
+//
+// https://misdemo.temple.edu/dailyquote  
+// https://misdemo.temple.edu/textbelt   
+// https://misdemo.temple.edu/auth 
+//
+// Notice that all these API URLS use https (not http)
+// when you have an application that leverages multiple APIs,
+// it is important that they either be *all* http or *all* https.
+
+
+// this command runs when the page is ready.... 
+$("#div-login").show();
+
+//supporting functions
+function login_controller(){
+    let the_serialized_data = $("#frm_login").serialize();    
+    console.log(the_serialized_data);
+    $.getJSON('https://misdemo.temple.edu/auth/',the_serialized_data,function(data){
+        // ICA step 5
+        if(typeof data == "string"){
+            $('#login_message').addClass("alert alert-danger");
+            $("#login_message").html(data);
+        } else {
+            $("#div-login").hide();
+            $("#div-quote").show();
+        }
+    });
+} //end login controller
+
+function get_the_quote(){ 
+	$.getJSON('https://misdemo.temple.edu/dailyquote/',function(data){
+	   console.log(data); 
+	   $("#quote").html(data["quote"]);
+	   $("#quote").addClass("alert alert-primary");
+	   $("#message").val(data["quote"]);
+	});
+}; //end send the text
+
+function send_the_text(){
+	var the_serialized_data = $("#frm_send_text").serialize();
+	
+	console.log(the_serialized_data);
+	 
+	$.post('https://misdemo.temple.edu/textbelt',the_serialized_data,function(data){
+	   console.log(data); 
+	});
+}; //end send the text
+
+//click handlers ************
+
+$('#btn_get_quote').click(function(){
+	get_the_quote();
+});
+
+$('#btn_send_text').click(function(){
+    $("#sms_message").html("");
+    $("#sms_message").removeClass();
+    
+    // step 6
+    let message = $("#message").val();
+    let phone = $("#phone").val();
+    if(message ==""||phone==""){
+        $("#sms_message").addClass("alert alert-danger");
+        $("#sms_message").html("add something");
+    }
+    send_the_text();
+});
+
+$('#btn_show_form').click(function(){
+	$("#div-quote").hide();
+	$("#div-sms").show();
+});
+
+$('#btn_show_quote').click(function(){
+	$("#div-quote").show();
+	$("#div-sms").hide();
+});
+
+$('#btn_login').click(function(){
+    $("#login_message").html("");
+    $("#login_message").removeClass();
+    let username = $("#username").val();
+    let password = $("#password").val();
+    // ICA step 4
+    if(username ==""||password==""){
+        $("#login_message").addClass("alert alert-danger");
+        $("#login_message").html("cannot leave blank");
+    } 
+    login_controller();
+})
+
+$('#link_logout').click(function(){
+    // step 7
+    $("#div-quote").hide();
+    $("#div-sms").hide();
+    $("#div-login").show();
+    $("#username").val("");
+    $("#password").val("");
+})
+
+
+</script>
+</html>
